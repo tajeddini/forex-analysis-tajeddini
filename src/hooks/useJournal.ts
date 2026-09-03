@@ -37,6 +37,14 @@ export function useJournal() {
     saveTrades(loadTrades().filter((t) => t.id !== id));
   }, []);
 
+  const updateTrade = useCallback((id: string, patch: Partial<Trade>) => {
+    saveTrades(loadTrades().map((t) => (t.id === id ? { ...t, ...patch, id } : t)));
+  }, []);
+
+  const addTrades = useCallback((list: Trade[]) => {
+    saveTrades([...loadTrades(), ...list]);
+  }, []);
+
   const replaceAll = useCallback((next: Trade[]) => {
     saveTrades(next);
   }, []);
@@ -45,5 +53,15 @@ export function useJournal() {
     saveCapital(value);
   }, []);
 
-  return { ready, trades, capital, addTrade, removeTrade, replaceAll, updateCapital };
+  return {
+    ready,
+    trades,
+    capital,
+    addTrade,
+    addTrades,
+    removeTrade,
+    updateTrade,
+    replaceAll,
+    updateCapital,
+  };
 }

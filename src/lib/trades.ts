@@ -20,6 +20,7 @@ export const PAIRS = [
 
 export type Trade = {
   id: string;
+  externalId?: string; // شماره پوزیشن متاتریدر برای جلوگیری از ورود تکراری
   date: string; // yyyy-mm-dd
   pair: string;
   direction: Direction;
