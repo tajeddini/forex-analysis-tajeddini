@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ImportRouteImport } from './routes/import'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as TradesRouteImport } from './routes/trades'
@@ -17,6 +18,11 @@ import { Route as TradesRouteImport } from './routes/trades'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportRoute = ImportRouteImport.update({
+  id: '/import',
+  path: '/import',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsRoute = InsightsRouteImport.update({
@@ -37,12 +43,14 @@ const TradesRoute = TradesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/import': typeof ImportRoute
   '/insights': typeof InsightsRoute
   '/new': typeof NewRoute
   '/trades': typeof TradesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/import': typeof ImportRoute
   '/insights': typeof InsightsRoute
   '/new': typeof NewRoute
   '/trades': typeof TradesRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/import': typeof ImportRoute
   '/insights': typeof InsightsRoute
   '/new': typeof NewRoute
   '/trades': typeof TradesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/insights' | '/new' | '/trades'
+  fullPaths: '/' | '/import' | '/insights' | '/new' | '/trades'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/insights' | '/new' | '/trades'
-  id: '__root__' | '/' | '/insights' | '/new' | '/trades'
+  to: '/' | '/import' | '/insights' | '/new' | '/trades'
+  id: '__root__' | '/' | '/import' | '/insights' | '/new' | '/trades'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ImportRoute: typeof ImportRoute
   InsightsRoute: typeof InsightsRoute
   NewRoute: typeof NewRoute
   TradesRoute: typeof TradesRoute
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/import': {
+      id: '/import'
+      path: '/import'
+      fullPath: '/import'
+      preLoaderRoute: typeof ImportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/insights': {
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ImportRoute: ImportRoute,
   InsightsRoute: InsightsRoute,
   NewRoute: NewRoute,
   TradesRoute: TradesRoute,
