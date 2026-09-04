@@ -196,13 +196,25 @@ function NewTrade() {
             <label className={labelClass} htmlFor="strategy">
               استراتژی / ستاپ
             </label>
-            <input
-              id="strategy"
-              name="strategy"
-              defaultValue="شکست سطح"
-              className={fieldClass}
-              maxLength={40}
-            />
+            {strategies.length > 0 ? (
+              <select
+                id="strategy"
+                name="strategy"
+                className={fieldClass}
+                defaultValue={strategies[0]?.name}
+              >
+                {strategies.map((s) => (
+                  <option key={s.id} value={s.name}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input id="strategy" name="strategy" className={fieldClass} maxLength={40} />
+            )}
+            <Link to="/strategies" className="mt-1.5 block text-[11px] text-gold/80 hover:text-gold">
+              مدیریت استراتژی‌ها
+            </Link>
           </div>
           <div>
             <label className={labelClass} htmlFor="emotion">
