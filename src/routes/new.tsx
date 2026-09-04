@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { useJournal } from "@/hooks/useJournal";
+import { useStrategies } from "@/hooks/useStrategies";
 import { computeStats, EMOTIONS, PAIRS, SESSIONS, type Trade } from "@/lib/trades";
 
 export const Route = createFileRoute("/new")({
@@ -48,6 +49,7 @@ const labelClass = "mb-1.5 block text-[11px] text-mute";
 function NewTrade() {
   const navigate = useNavigate();
   const { addTrade, trades, capital } = useJournal();
+  const { strategies } = useStrategies();
   const stats = computeStats(trades, capital);
   const [error, setError] = useState<string | null>(null);
   const today = new Date().toISOString().slice(0, 10);
