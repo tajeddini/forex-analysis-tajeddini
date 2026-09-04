@@ -1,0 +1,328 @@
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { z } from "zod";
+import { useStrategies } from "@/hooks/useStrategies";
+import { EMOTIONS, PAIRS, SESSIONS, type Trade, type Session, type Emotion } from "@/lib/trades";
+
+const schema = z.object({
+  date: z.string().min(1, "تاریخ را وارد کنید"),
+  pair: z.string().trim().min(2, "جفت‌ارز را وارد کنید").max(20),
+  direction: z.enum(["buy", "sell"]),
+  lot: z.number().positive("حجم باید بزرگ‌تر از صفر باشد").max(1000),
+  entry: z.number().positive("قیمت ورود نامعتبر است"),
+  exit: z.number().positive("قیمت خروج نامعتبر است"),
+  stop: z.number().nonnegative().optional(),
+  pnl: z.number().finite("سود/زیان را وارد کنید"),
+  session: z.string().min(1),
+  strategy: z.string().trim().min(2, "نام استراتژی را بنویسید").max(40),
+  emotion: z.string().min(1),
+  followedPlan: z.boolean(),
+  notes: z.string().max(500).optional(),
+});
+
+const fieldClass =
+  "w-full rounded-md bg-panel2 px-3 py-2 text-sm text-foreground ring-1 ring-line outline-none transition focus:ring-gold";
+const labelClass = "mb-1.5 block text-[11px] text-mute";
+
+export type TradeFormSubmitData = Omit<Trade, "id" | "externalId">;
+
+interface TradeFormProps {
+  mode: "create" | "edit";
+  trade?: Trade;
+  onSubmit: (data: TradeFormSubmitData) => void;
+  onCancel: () => void;
+  onDelete?: () => void;
+}
+
+export function TradeForm({ mode, trade, onSubmit, onCancel, onDelete }: TradeFormProps) {
+  const { strategies } = useStrategies();
+  const [error, setError] = useState<string | null>(null);
+  const isCreate = mode === "create";
+  const today = new Date().toISOString().slice(0, 10);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const num = (k: string) => {
+      const v = fd.get(k);
+      return v === null || v === "" ? undefined : Number(v);
+    };
+    const parsed = schema.safeParse({
+      date: String(fd.get("date") ?? ""),
+      pair: String(fd.get("pair") ?? ""),
+      direction: String(fd.get("direction") ?? "buy"),
+      lot: num("lot"),
+      entry: num("entry"),
+      exit: num("exit"),
+      stop: num("stop"),
+      pnl: num("pnl"),
+      session: String(fd.get("session") ?? ""),
+      strategy: String(fd.get("strategy") ?? ""),
+      emotion: String(fd.get("emotion") ?? ""),
+      followedPlan: fd.get("followedPlan") === "on",
+      notes: String(fd.get("notes") ?? ""),
+    });
+
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "ورودی نامعتبر است");
+      return;
+    }
+
+    const data = parsed.data;
+    const output: TradeFormSubmitData = {
+      date: data.date,
+      pair: data.pair,
+      direction: data.direction,
+      lot: data.lot,
+      entry: data.entry,
+      exit: data.exit,
+      pnl: data.pnl,
+      session: data.session as Session,
+      strategy: data.strategy,
+      emotion: data.emotion as Emotion,
+      followedPlan: data.followedPlan,
+      ...(data.stop !== undefined ? { stop: data.stop } : {}),
+      ...(data.notes ? { notes: data.notes } : {}),
+    };
+
+    onSubmit(output);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="rounded-lg bg-panel p-5 ring-1 ring-line">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div>
+          <label className={labelClass} htmlFor="date">
+            تاریخ
+          </label>
+          <input
+            id="date"
+            name="date"
+            type="date"
+            defaultValue={isCreate ? today : trade?.date}
+            className={fieldClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="pair">
+            جفت‌ارز
+          </label>
+          <input
+            id="pair"
+            name="pair"
+            list="pairs"
+            defaultValue={isCreate ? "EUR/USD" : trade?.pair}
+            className={fieldClass}
+            dir="ltr"
+          />
+          <datalist id="pairs">
+            {PAIRS.map((p) => (
+              <option key={p} value={p} />
+            ))}
+          </datalist>
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="direction">
+            جهت
+          </label>
+          <select
+            id="direction"
+            name="direction"
+            className={fieldClass}
+            defaultValue={isCreate ? "buy" : trade?.direction}
+          >
+            <option value="buy">خرید</option>
+            <option value="sell">فروش</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="lot">
+            حجم (لوت)
+          </label>
+          <input
+            id="lot"
+            name="lot"
+            type="number"
+            step="0.01"
+            defaultValue={isCreate ? "0.1" : trade?.lot}
+            className={fieldClass}
+            dir="ltr"
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="entry">
+            قیمت ورود
+          </label>
+          <input
+            id="entry"
+            name="entry"
+            type="number"
+            step="any"
+            defaultValue={trade?.entry}
+            className={fieldClass}
+            dir="ltr"
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="exit">
+            قیمت خروج
+          </label>
+          <input
+            id="exit"
+            name="exit"
+            type="number"
+            step="any"
+            defaultValue={trade?.exit}
+            className={fieldClass}
+            dir="ltr"
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="stop">
+            حد ضرر (اختیاری — برای محاسبه R)
+          </label>
+          <input
+            id="stop"
+            name="stop"
+            type="number"
+            step="any"
+            defaultValue={trade?.stop ?? ""}
+            className={fieldClass}
+            dir="ltr"
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="pnl">
+            سود / زیان (دلار)
+          </label>
+          <input
+            id="pnl"
+            name="pnl"
+            type="number"
+            step="any"
+            placeholder="مثلاً 250 یا 180-"
+            defaultValue={trade?.pnl}
+            className={fieldClass}
+            dir="ltr"
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="session">
+            سشن
+          </label>
+          <select
+            id="session"
+            name="session"
+            className={fieldClass}
+            defaultValue={isCreate ? "لندن" : trade?.session}
+          >
+            {SESSIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="strategy">
+            استراتژی / ستاپ
+          </label>
+          {strategies.length > 0 ? (
+            <select
+              id="strategy"
+              name="strategy"
+              className={fieldClass}
+              defaultValue={isCreate ? strategies[0]?.name : trade?.strategy}
+            >
+              {strategies.map((s) => (
+                <option key={s.id} value={s.name}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              id="strategy"
+              name="strategy"
+              className={fieldClass}
+              maxLength={40}
+              defaultValue={isCreate ? "" : trade?.strategy}
+            />
+          )}
+          <Link to="/strategies" className="mt-1.5 block text-[11px] text-gold/80 hover:text-gold">
+            مدیریت استراتژی‌ها
+          </Link>
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="emotion">
+            حالت روانی هنگام ورود
+          </label>
+          <select
+            id="emotion"
+            name="emotion"
+            className={fieldClass}
+            defaultValue={isCreate ? "آرام" : trade?.emotion}
+          >
+            {EMOTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-end">
+          <label className="flex w-full cursor-pointer items-center gap-2 rounded-md bg-panel2 px-3 py-2.5 text-sm ring-1 ring-line">
+            <input
+              name="followedPlan"
+              type="checkbox"
+              defaultChecked={isCreate ? true : trade?.followedPlan}
+              className="accent-gold"
+            />
+            مطابق پلن معاملاتی بود
+          </label>
+        </div>
+        <div className="sm:col-span-2 xl:col-span-3">
+          <label className={labelClass} htmlFor="notes">
+            یادداشت
+          </label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows={3}
+            maxLength={500}
+            placeholder="دلیل ورود، شرایط بازار، اشتباه احتمالی..."
+            defaultValue={trade?.notes ?? ""}
+            className={fieldClass}
+          />
+        </div>
+      </div>
+
+      {error ? <p className="mt-4 text-sm text-loss">{error}</p> : null}
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        <button
+          type="submit"
+          className="rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-background transition hover:brightness-110"
+        >
+          {isCreate ? "ثبت معامله" : "ذخیره تغییرات"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-md bg-panel2 px-5 py-2.5 text-sm text-foreground ring-1 ring-line transition hover:bg-line/40"
+        >
+          {isCreate ? "پاک کردن فرم" : "انصراف"}
+        </button>
+        {!isCreate && onDelete ? (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="rounded-md px-5 py-2.5 text-sm text-loss ring-1 ring-loss/40 transition hover:bg-loss/10"
+          >
+            حذف معامله
+          </button>
+        ) : null}
+      </div>
+    </form>
+  );
+}
