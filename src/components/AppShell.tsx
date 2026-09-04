@@ -5,6 +5,7 @@ import { fmtUsd } from "@/lib/trades";
 const NAV = [
   { to: "/", label: "داشبورد", glyph: "▦" },
   { to: "/new", label: "ثبت ترید", glyph: "＋" },
+  { to: "/import", label: "ورود از متاتریدر", glyph: "⭳" },
   { to: "/trades", label: "لیست تریدها", glyph: "≡" },
   { to: "/insights", label: "تحلیل و بینش", glyph: "◍" },
 ] as const;
