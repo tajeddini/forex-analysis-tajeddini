@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { useJournal } from "@/hooks/useJournal";
 import { computeStats, EMOTIONS, PAIRS, SESSIONS, type Trade } from "@/lib/trades";
 
-export const Route = createFileRoute("/trades/$id")({
+export const Route = createFileRoute("/trade/$id")({
   head: () => ({
     meta: [
       { title: "ویرایش معامله | سِجِل" },
@@ -45,7 +45,7 @@ const fieldClass =
 const labelClass = "mb-1.5 block text-[11px] text-mute";
 
 function EditTrade() {
-  const { id } = useParams({ from: "/trades/$id" });
+  const { id } = useParams({ from: "/trade/$id" });
   const navigate = useNavigate();
   const { ready, trades, capital, updateTrade, removeTrade } = useJournal();
   const stats = computeStats(trades, capital);
