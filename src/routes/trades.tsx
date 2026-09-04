@@ -178,10 +178,11 @@ function TradesPage() {
                           removeTrade(t.id);
                           toast.success("معامله حذف شد");
                         }}
-                        className="text-[11px] text-mute transition hover:text-loss"
+                        className="rounded border border-line px-2 py-1 text-[11px] text-mute transition hover:border-loss/40 hover:text-loss"
                       >
                         حذف
                       </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
