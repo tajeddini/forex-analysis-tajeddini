@@ -76,7 +76,9 @@ function TradesPage() {
         >
           ثبت معامله جدید
         </Link>
+        </div>
       </div>
+
 
       <div className="overflow-hidden rounded-lg bg-panel ring-1 ring-line">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
