@@ -8,6 +8,7 @@ const NAV = [
   { to: "/import", label: "ورود از متاتریدر", glyph: "⭳" },
   { to: "/trades", label: "لیست تریدها", glyph: "≡" },
   { to: "/insights", label: "تحلیل و بینش", glyph: "◍" },
+  { to: "/strategies", label: "استراتژی‌ها", glyph: "✦" },
 ] as const;
 
 export function AppShell({
