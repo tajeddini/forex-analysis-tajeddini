@@ -165,10 +165,11 @@ function TradesPage() {
                       {fmtUsd(t.pnl)}
                     </td>
                     <td className="px-5 py-3">
+                      <div className="flex items-center justify-end gap-4">
                       <Link
-                        to="/trades/$id"
+                        to="/trade/$id"
                         params={{ id: t.id }}
-                        className="ml-3 text-[11px] text-mute transition hover:text-gold"
+                        className="rounded border border-line px-2 py-1 text-[11px] text-mute transition hover:border-gold/40 hover:text-gold"
                       >
                         ویرایش
                       </Link>
