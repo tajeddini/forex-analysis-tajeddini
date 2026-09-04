@@ -14,7 +14,7 @@ import { Route as ImportRouteImport } from './routes/import'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as TradesRouteImport } from './routes/trades'
-import { Route as TradesIdRouteImport } from './routes/trades.$id'
+import { Route as TradeIdRouteImport } from './routes/trade.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,10 +41,10 @@ const TradesRoute = TradesRouteImport.update({
   path: '/trades',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TradesIdRoute = TradesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => TradesRoute,
+const TradeIdRoute = TradeIdRouteImport.update({
+  id: '/trade/$id',
+  path: '/trade/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -52,16 +52,16 @@ export interface FileRoutesByFullPath {
   '/import': typeof ImportRoute
   '/insights': typeof InsightsRoute
   '/new': typeof NewRoute
-  '/trades': typeof TradesRouteWithChildren
-  '/trades/$id': typeof TradesIdRoute
+  '/trades': typeof TradesRoute
+  '/trade/$id': typeof TradeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/import': typeof ImportRoute
   '/insights': typeof InsightsRoute
   '/new': typeof NewRoute
-  '/trades': typeof TradesRouteWithChildren
-  '/trades/$id': typeof TradesIdRoute
+  '/trades': typeof TradesRoute
+  '/trade/$id': typeof TradeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,14 +69,14 @@ export interface FileRoutesById {
   '/import': typeof ImportRoute
   '/insights': typeof InsightsRoute
   '/new': typeof NewRoute
-  '/trades': typeof TradesRouteWithChildren
-  '/trades/$id': typeof TradesIdRoute
+  '/trades': typeof TradesRoute
+  '/trade/$id': typeof TradeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/import' | '/insights' | '/new' | '/trades' | '/trades/$id'
+  fullPaths: '/' | '/import' | '/insights' | '/new' | '/trades' | '/trade/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/import' | '/insights' | '/new' | '/trades' | '/trades/$id'
+  to: '/' | '/import' | '/insights' | '/new' | '/trades' | '/trade/$id'
   id:
     | '__root__'
     | '/'
@@ -84,7 +84,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/new'
     | '/trades'
-    | '/trades/$id'
+    | '/trade/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -92,7 +92,8 @@ export interface RootRouteChildren {
   ImportRoute: typeof ImportRoute
   InsightsRoute: typeof InsightsRoute
   NewRoute: typeof NewRoute
-  TradesRoute: typeof TradesRouteWithChildren
+  TradesRoute: typeof TradesRoute
+  TradeIdRoute: typeof TradeIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -132,33 +133,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TradesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/trades/$id': {
-      id: '/trades/$id'
-      path: '/$id'
-      fullPath: '/trades/$id'
-      preLoaderRoute: typeof TradesIdRouteImport
-      parentRoute: typeof TradesRoute
+    '/trade/$id': {
+      id: '/trade/$id'
+      path: '/trade/$id'
+      fullPath: '/trade/$id'
+      preLoaderRoute: typeof TradeIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface TradesRouteChildren {
-  TradesIdRoute: typeof TradesIdRoute
-}
-
-const TradesRouteChildren: TradesRouteChildren = {
-  TradesIdRoute: TradesIdRoute,
-}
-
-const TradesRouteWithChildren =
-  TradesRoute._addFileChildren(TradesRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ImportRoute: ImportRoute,
   InsightsRoute: InsightsRoute,
   NewRoute: NewRoute,
-  TradesRoute: TradesRouteWithChildren,
+  TradesRoute: TradesRoute,
+  TradeIdRoute: TradeIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
