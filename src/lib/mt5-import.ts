@@ -104,7 +104,7 @@ export function parseMt5Workbook(buffer: ArrayBuffer): ParsedRow[] {
         lot,
         entry,
         exit,
-        stop: stop && stop > 0 ? stop : undefined,
+        ...(stop && stop > 0 ? { stop } : {}),
         pnl: Number((profit + commission + swap).toFixed(2)),
         session: sessionFromHour(hour),
       });
@@ -124,7 +124,7 @@ export function toTrade(row: ParsedRow, strategy: string): Trade {
     lot: row.lot,
     entry: row.entry,
     exit: row.exit,
-    stop: row.stop,
+    ...(row.stop !== undefined ? { stop: row.stop } : {}),
     pnl: row.pnl,
     session: row.session,
     strategy,
