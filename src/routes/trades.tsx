@@ -63,13 +63,22 @@ function TradesPage() {
           <div className="mb-2 text-[11px] uppercase tracking-[0.25em] text-gold/80">تاریخچه</div>
           <h1 className="text-4xl font-extrabold leading-none tracking-tight">لیست معاملات</h1>
         </div>
+        <div className="flex items-center gap-2">
+        <Link
+          to="/import"
+          className="rounded-md bg-panel2 px-4 py-2 text-sm font-semibold text-mute ring-1 ring-line transition hover:text-foreground"
+        >
+          ورود از متاتریدر
+        </Link>
         <Link
           to="/new"
           className="rounded-md bg-gold px-4 py-2 text-sm font-semibold text-background transition hover:brightness-110"
         >
           ثبت معامله جدید
         </Link>
+        </div>
       </div>
+
 
       <div className="overflow-hidden rounded-lg bg-panel ring-1 ring-line">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
@@ -156,6 +165,13 @@ function TradesPage() {
                       {fmtUsd(t.pnl)}
                     </td>
                     <td className="px-5 py-3">
+                      <Link
+                        to="/trades/$id"
+                        params={{ id: t.id }}
+                        className="ml-3 text-[11px] text-mute transition hover:text-gold"
+                      >
+                        ویرایش
+                      </Link>
                       <button
                         onClick={() => {
                           removeTrade(t.id);
