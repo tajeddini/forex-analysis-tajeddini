@@ -21,7 +21,7 @@ import {
   rMultiple,
 } from "@/lib/trades";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "داشبورد عملکرد | سِجِل — دفتر معاملاتی فارکس" },

@@ -5,7 +5,7 @@ import { TradeForm, type TradeFormSubmitData } from "@/components/TradeForm";
 import { useJournal } from "@/hooks/useJournal";
 import { computeStats, type Trade } from "@/lib/trades";
 
-export const Route = createFileRoute("/new")({
+export const Route = createFileRoute("/_authenticated/new")({
   head: () => ({
     meta: [
       { title: "ثبت معامله جدید | سِجِل" },

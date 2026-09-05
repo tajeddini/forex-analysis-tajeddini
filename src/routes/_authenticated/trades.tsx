@@ -13,7 +13,7 @@ import {
   weekdayOf,
 } from "@/lib/trades";
 
-export const Route = createFileRoute("/trades")({
+export const Route = createFileRoute("/_authenticated/trades")({
   head: () => ({
     meta: [
       { title: "لیست معاملات | سِجِل" },

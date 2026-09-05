@@ -6,7 +6,7 @@ import { useJournal } from "@/hooks/useJournal";
 import { useStrategies } from "@/hooks/useStrategies";
 import { computeStats } from "@/lib/trades";
 
-export const Route = createFileRoute("/strategies")({
+export const Route = createFileRoute("/_authenticated/strategies")({
   head: () => ({
     meta: [
       { title: "مدیریت استراتژی‌ها | سِجِل" },

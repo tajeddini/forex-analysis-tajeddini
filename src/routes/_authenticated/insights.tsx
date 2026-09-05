@@ -12,7 +12,7 @@ import {
   type Bucket,
 } from "@/lib/trades";
 
-export const Route = createFileRoute("/insights")({
+export const Route = createFileRoute("/_authenticated/insights")({
   head: () => ({
     meta: [
       { title: "تحلیل و بینش | سِجِل" },

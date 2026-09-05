@@ -9,82 +9,82 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ImportRouteImport } from './routes/import'
-import { Route as InsightsRouteImport } from './routes/insights'
-import { Route as NewRouteImport } from './routes/new'
-import { Route as StrategiesRouteImport } from './routes/strategies'
-import { Route as TradesRouteImport } from './routes/trades'
-import { Route as TradeIdRouteImport } from './routes/trade.$id'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedImportRouteImport } from './routes/_authenticated/import'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
+import { Route as AuthenticatedNewRouteImport } from './routes/_authenticated/new'
+import { Route as AuthenticatedStrategiesRouteImport } from './routes/_authenticated/strategies'
+import { Route as AuthenticatedTradesRouteImport } from './routes/_authenticated/trades'
+import { Route as AuthenticatedTradeIdRouteImport } from './routes/_authenticated/trade.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/_authenticated/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ImportRoute = ImportRouteImport.update({
-  id: '/import',
+const AuthenticatedImportRoute = AuthenticatedImportRouteImport.update({
+  id: '/_authenticated/import',
   path: '/import',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InsightsRoute = InsightsRouteImport.update({
-  id: '/insights',
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/_authenticated/insights',
   path: '/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NewRoute = NewRouteImport.update({
-  id: '/new',
+const AuthenticatedNewRoute = AuthenticatedNewRouteImport.update({
+  id: '/_authenticated/new',
   path: '/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StrategiesRoute = StrategiesRouteImport.update({
-  id: '/strategies',
+const AuthenticatedStrategiesRoute = AuthenticatedStrategiesRouteImport.update({
+  id: '/_authenticated/strategies',
   path: '/strategies',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TradesRoute = TradesRouteImport.update({
-  id: '/trades',
+const AuthenticatedTradesRoute = AuthenticatedTradesRouteImport.update({
+  id: '/_authenticated/trades',
   path: '/trades',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TradeIdRoute = TradeIdRouteImport.update({
-  id: '/trade/$id',
+const AuthenticatedTradeIdRoute = AuthenticatedTradeIdRouteImport.update({
+  id: '/_authenticated/trade/$id',
   path: '/trade/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/import': typeof ImportRoute
-  '/insights': typeof InsightsRoute
-  '/new': typeof NewRoute
-  '/strategies': typeof StrategiesRoute
-  '/trades': typeof TradesRoute
-  '/trade/$id': typeof TradeIdRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/import': typeof AuthenticatedImportRoute
+  '/insights': typeof AuthenticatedInsightsRoute
+  '/new': typeof AuthenticatedNewRoute
+  '/strategies': typeof AuthenticatedStrategiesRoute
+  '/trades': typeof AuthenticatedTradesRoute
+  '/trade/$id': typeof AuthenticatedTradeIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/import': typeof ImportRoute
-  '/insights': typeof InsightsRoute
-  '/new': typeof NewRoute
-  '/strategies': typeof StrategiesRoute
-  '/trades': typeof TradesRoute
-  '/trade/$id': typeof TradeIdRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/import': typeof AuthenticatedImportRoute
+  '/insights': typeof AuthenticatedInsightsRoute
+  '/new': typeof AuthenticatedNewRoute
+  '/strategies': typeof AuthenticatedStrategiesRoute
+  '/trades': typeof AuthenticatedTradesRoute
+  '/trade/$id': typeof AuthenticatedTradeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/import': typeof ImportRoute
-  '/insights': typeof InsightsRoute
-  '/new': typeof NewRoute
-  '/strategies': typeof StrategiesRoute
-  '/trades': typeof TradesRoute
-  '/trade/$id': typeof TradeIdRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/import': typeof AuthenticatedImportRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
+  '/_authenticated/new': typeof AuthenticatedNewRoute
+  '/_authenticated/strategies': typeof AuthenticatedStrategiesRoute
+  '/_authenticated/trades': typeof AuthenticatedTradesRoute
+  '/_authenticated/trade/$id': typeof AuthenticatedTradeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
+    | '/dashboard'
     | '/import'
     | '/insights'
     | '/new'
@@ -93,7 +93,7 @@ export interface FileRouteTypes {
     | '/trade/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/dashboard'
     | '/import'
     | '/insights'
     | '/new'
@@ -102,87 +102,87 @@ export interface FileRouteTypes {
     | '/trade/$id'
   id:
     | '__root__'
-    | '/'
-    | '/import'
-    | '/insights'
-    | '/new'
-    | '/strategies'
-    | '/trades'
-    | '/trade/$id'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/import'
+    | '/_authenticated/insights'
+    | '/_authenticated/new'
+    | '/_authenticated/strategies'
+    | '/_authenticated/trades'
+    | '/_authenticated/trade/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ImportRoute: typeof ImportRoute
-  InsightsRoute: typeof InsightsRoute
-  NewRoute: typeof NewRoute
-  StrategiesRoute: typeof StrategiesRoute
-  TradesRoute: typeof TradesRoute
-  TradeIdRoute: typeof TradeIdRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedImportRoute: typeof AuthenticatedImportRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
+  AuthenticatedNewRoute: typeof AuthenticatedNewRoute
+  AuthenticatedStrategiesRoute: typeof AuthenticatedStrategiesRoute
+  AuthenticatedTradesRoute: typeof AuthenticatedTradesRoute
+  AuthenticatedTradeIdRoute: typeof AuthenticatedTradeIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/import': {
-      id: '/import'
+    '/_authenticated/import': {
+      id: '/_authenticated/import'
       path: '/import'
       fullPath: '/import'
-      preLoaderRoute: typeof ImportRouteImport
+      preLoaderRoute: typeof AuthenticatedImportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/insights': {
-      id: '/insights'
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
       path: '/insights'
       fullPath: '/insights'
-      preLoaderRoute: typeof InsightsRouteImport
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/new': {
-      id: '/new'
+    '/_authenticated/new': {
+      id: '/_authenticated/new'
       path: '/new'
       fullPath: '/new'
-      preLoaderRoute: typeof NewRouteImport
+      preLoaderRoute: typeof AuthenticatedNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/strategies': {
-      id: '/strategies'
+    '/_authenticated/strategies': {
+      id: '/_authenticated/strategies'
       path: '/strategies'
       fullPath: '/strategies'
-      preLoaderRoute: typeof StrategiesRouteImport
+      preLoaderRoute: typeof AuthenticatedStrategiesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/trades': {
-      id: '/trades'
+    '/_authenticated/trades': {
+      id: '/_authenticated/trades'
       path: '/trades'
       fullPath: '/trades'
-      preLoaderRoute: typeof TradesRouteImport
+      preLoaderRoute: typeof AuthenticatedTradesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/trade/$id': {
-      id: '/trade/$id'
+    '/_authenticated/trade/$id': {
+      id: '/_authenticated/trade/$id'
       path: '/trade/$id'
       fullPath: '/trade/$id'
-      preLoaderRoute: typeof TradeIdRouteImport
+      preLoaderRoute: typeof AuthenticatedTradeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ImportRoute: ImportRoute,
-  InsightsRoute: InsightsRoute,
-  NewRoute: NewRoute,
-  StrategiesRoute: StrategiesRoute,
-  TradesRoute: TradesRoute,
-  TradeIdRoute: TradeIdRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedImportRoute: AuthenticatedImportRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
+  AuthenticatedNewRoute: AuthenticatedNewRoute,
+  AuthenticatedStrategiesRoute: AuthenticatedStrategiesRoute,
+  AuthenticatedTradesRoute: AuthenticatedTradesRoute,
+  AuthenticatedTradeIdRoute: AuthenticatedTradeIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
