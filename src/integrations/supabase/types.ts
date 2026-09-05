@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          capital: number
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          capital?: number
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          capital?: number
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      strategies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          created_at: string
+          date: string
+          direction: string
+          emotion: string
+          entry: number
+          exit: number
+          external_id: string | null
+          followed_plan: boolean
+          id: string
+          lot: number
+          notes: string | null
+          pair: string
+          pnl: number
+          session: string
+          stop: number | null
+          strategy: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          direction: string
+          emotion: string
+          entry?: number
+          exit?: number
+          external_id?: string | null
+          followed_plan?: boolean
+          id?: string
+          lot?: number
+          notes?: string | null
+          pair: string
+          pnl?: number
+          session: string
+          stop?: number | null
+          strategy: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          direction?: string
+          emotion?: string
+          entry?: number
+          exit?: number
+          external_id?: string | null
+          followed_plan?: boolean
+          id?: string
+          lot?: number
+          notes?: string | null
+          pair?: string
+          pnl?: number
+          session?: string
+          stop?: number | null
+          strategy?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
