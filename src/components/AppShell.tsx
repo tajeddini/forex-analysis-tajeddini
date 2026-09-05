@@ -1,9 +1,12 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import type { ReactNode } from "react";
 import { fmtUsd } from "@/lib/trades";
 
 const NAV = [
-  { to: "/", label: "داشبورد", glyph: "▦" },
+  { to: "/dashboard", label: "داشبورد", glyph: "▦" },
   { to: "/new", label: "ثبت ترید", glyph: "＋" },
   { to: "/import", label: "ورود از متاتریدر", glyph: "⭳" },
   { to: "/trades", label: "لیست تریدها", glyph: "≡" },
@@ -21,6 +24,28 @@ export function AppShell({
   tradeCount?: number;
 }) {
   const progress = Math.min(100, Math.abs(monthPnl) / 200);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    void supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      setName((profile?.display_name as string) || data.user.email || "");
+    });
+  }, []);
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   return (
     <div dir="rtl" lang="fa" className="min-h-screen bg-background text-foreground">
@@ -40,9 +65,15 @@ export function AppShell({
               {tradeCount} معامله ثبت‌شده
             </span>
             <div className="h-px w-8 bg-line" />
-            <div className="grid size-9 place-items-center rounded-full bg-panel2 text-[11px] text-mute ring-1 ring-line">
-              FX
-            </div>
+            {name ? (
+              <span className="max-w-[9rem] truncate text-[11px] text-foreground">{name}</span>
+            ) : null}
+            <button
+              onClick={handleSignOut}
+              className="rounded-md px-2.5 py-1.5 text-[11px] text-mute ring-1 ring-line transition-colors hover:text-foreground"
+            >
+              خروج
+            </button>
           </div>
         </header>
 
@@ -53,7 +84,7 @@ export function AppShell({
                 <Link
                   key={item.to}
                   to={item.to}
-                  activeOptions={{ exact: item.to === "/" }}
+                  
                   className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-mute transition-colors hover:bg-panel hover:text-foreground"
                   activeProps={{
                     className:
@@ -93,7 +124,7 @@ export function AppShell({
             <Link
               key={item.to}
               to={item.to}
-              activeOptions={{ exact: item.to === "/" }}
+              
               className="rounded-md px-3 py-1.5 text-[11px] text-mute"
               activeProps={{ className: "rounded-md px-3 py-1.5 text-[11px] text-gold bg-gold/10" }}
             >
