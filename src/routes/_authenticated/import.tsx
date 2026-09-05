@@ -6,7 +6,7 @@ import { useJournal } from "@/hooks/useJournal";
 import { parseMt5Workbook, toTrade, type ParsedRow } from "@/lib/mt5-import";
 import { computeStats, fmtDate, fmtNum, fmtUsd } from "@/lib/trades";
 
-export const Route = createFileRoute("/import")({
+export const Route = createFileRoute("/_authenticated/import")({
   head: () => ({
     meta: [
       { title: "ورود معاملات از متاتریدر ۵ | سِجِل" },
