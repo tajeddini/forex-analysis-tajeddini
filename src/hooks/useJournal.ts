@@ -98,7 +98,7 @@ export function useJournal() {
       await supabase.from("trades").insert(toRow(trade, userId, accountId) as never);
       await refresh();
     },
-    [refresh, userId],
+    [accountId, refresh, userId],
   );
 
   const addTrades = useCallback(
