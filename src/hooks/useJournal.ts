@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccounts } from "@/hooks/useAccounts";
 import type { Trade } from "@/lib/trades";
 
 type Row = {
@@ -40,10 +41,11 @@ function toTrade(r: Row): Trade {
   };
 }
 
-function toRow(t: Trade, userId: string) {
+function toRow(t: Trade, userId: string, accountId: string) {
   return {
     id: t.id,
     user_id: userId,
+    account_id: accountId,
     external_id: t.externalId ?? null,
     date: t.date,
     pair: t.pair,
@@ -64,26 +66,27 @@ function toRow(t: Trade, userId: string) {
 export function useJournal() {
   const [ready, setReady] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [capital, setCapital] = useState(10000);
   const [userId, setUserId] = useState<string | null>(null);
+  const { selectedId: accountId, selected, accountsReady, updateAccount } = useAccounts();
+  const capital = selected?.capital ?? 10000;
 
   const refresh = useCallback(async () => {
     const { data: auth } = await supabase.auth.getUser();
     const uid = auth.user?.id ?? null;
     setUserId(uid);
-    if (!uid) {
+    if (!uid || !accountId) {
       setTrades([]);
-      setReady(true);
+      setReady(accountsReady);
       return;
     }
-    const [{ data: rows }, { data: profile }] = await Promise.all([
-      supabase.from("trades").select("*").order("date", { ascending: true }),
-      supabase.from("profiles").select("capital").eq("id", uid).maybeSingle(),
-    ]);
+    const { data: rows } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("account_id", accountId)
+      .order("date", { ascending: true });
     setTrades(((rows ?? []) as unknown as Row[]).map(toTrade));
-    if (profile?.capital != null) setCapital(Number(profile.capital));
     setReady(true);
-  }, []);
+  }, [accountId, accountsReady]);
 
   useEffect(() => {
     void refresh();
@@ -91,20 +94,20 @@ export function useJournal() {
 
   const addTrade = useCallback(
     async (trade: Trade) => {
-      if (!userId) return;
-      await supabase.from("trades").insert(toRow(trade, userId) as never);
+      if (!userId || !accountId) return;
+      await supabase.from("trades").insert(toRow(trade, userId, accountId) as never);
       await refresh();
     },
-    [refresh, userId],
+    [accountId, refresh, userId],
   );
 
   const addTrades = useCallback(
     async (list: Trade[]) => {
-      if (!userId || !list.length) return;
-      await supabase.from("trades").insert(list.map((t) => toRow(t, userId)) as never);
+      if (!userId || !accountId || !list.length) return;
+      await supabase.from("trades").insert(list.map((t) => toRow(t, userId, accountId)) as never);
       await refresh();
     },
-    [refresh, userId],
+    [accountId, refresh, userId],
   );
 
   const removeTrade = useCallback(
@@ -118,35 +121,35 @@ export function useJournal() {
   const updateTrade = useCallback(
     async (id: string, patch: Partial<Trade>) => {
       const current = trades.find((t) => t.id === id);
-      if (!current || !userId) return;
+      if (!current || !userId || !accountId) return;
       await supabase
         .from("trades")
-        .update(toRow({ ...current, ...patch, id }, userId) as never)
+        .update(toRow({ ...current, ...patch, id }, userId, accountId) as never)
         .eq("id", id);
       await refresh();
     },
-    [refresh, trades, userId],
+    [accountId, refresh, trades, userId],
   );
 
   const replaceAll = useCallback(
     async (next: Trade[]) => {
-      if (!userId) return;
-      await supabase.from("trades").delete().eq("user_id", userId);
+      if (!userId || !accountId) return;
+      await supabase.from("trades").delete().eq("account_id", accountId);
       if (next.length) {
-        await supabase.from("trades").insert(next.map((t) => toRow(t, userId)) as never);
+        await supabase.from("trades").insert(next.map((t) => toRow(t, userId, accountId)) as never);
       }
       await refresh();
     },
-    [refresh, userId],
+    [accountId, refresh, userId],
   );
 
   const updateCapital = useCallback(
     async (value: number) => {
-      if (!userId) return;
-      setCapital(value);
-      await supabase.from("profiles").update({ capital: value } as never).eq("id", userId);
+      if (!selected) return;
+      await updateAccount(selected.id, selected.name, value, selected.note);
+      await refresh();
     },
-    [userId],
+    [refresh, selected, updateAccount],
   );
 
   return {

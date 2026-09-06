@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          capital: number
+          created_at: string
+          id: string
+          name: string
+          note: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          capital?: number
+          created_at?: string
+          id?: string
+          name: string
+          note?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          capital?: number
+          created_at?: string
+          id?: string
+          name?: string
+          note?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           capital: number
@@ -64,6 +94,7 @@ export type Database = {
       }
       trades: {
         Row: {
+          account_id: string | null
           created_at: string
           date: string
           direction: string
@@ -84,6 +115,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           date: string
           direction: string
@@ -104,6 +136,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           date?: string
           direction?: string
@@ -123,7 +156,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trades_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
