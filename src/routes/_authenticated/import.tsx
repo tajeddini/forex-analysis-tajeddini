@@ -3,7 +3,12 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useJournal } from "@/hooks/useJournal";
-import { parseMt5Workbook, toTrade, type ParsedRow } from "@/lib/mt5-import";
+import {
+  DEFAULT_TEHRAN_OFFSET_MIN,
+  parseMt5Workbook,
+  toTrade,
+  type ParsedRow,
+} from "@/lib/mt5-import";
 import { computeStats, fmtDate, fmtNum, fmtUsd } from "@/lib/trades";
 
 export const Route = createFileRoute("/_authenticated/import")({
@@ -33,6 +38,8 @@ function ImportPage() {
   const { trades, capital, addTrades } = useJournal();
   const stats = computeStats(trades, capital);
   const inputRef = useRef<HTMLInputElement>(null);
+  const bufferRef = useRef<ArrayBuffer | null>(null);
+  const [offset, setOffset] = useState(DEFAULT_TEHRAN_OFFSET_MIN);
 
   const [rows, setRows] = useState<ParsedRow[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -47,7 +54,9 @@ function ImportPage() {
     setBusy(true);
     setError(null);
     try {
-      const parsed = parseMt5Workbook(await file.arrayBuffer());
+      const buf = await file.arrayBuffer();
+      bufferRef.current = buf;
+      const parsed = parseMt5Workbook(buf, offset);
       if (parsed.length === 0) {
         setRows([]);
         setError("در این فایل جدول Positions پیدا نشد. گزارش «History» متاتریدر ۵ را در قالب XLSX ذخیره کنید.");
@@ -63,6 +72,13 @@ function ImportPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function changeOffset(next: number) {
+    setOffset(next);
+    if (!bufferRef.current) return;
+    const parsed = parseMt5Workbook(bufferRef.current, next);
+    setRows(parsed);
   }
 
   const chosen = rows.filter((r) => selected[r.externalId]);
@@ -90,7 +106,7 @@ function ImportPage() {
       </div>
 
       <div className="rounded-lg bg-panel p-5 ring-1 ring-line">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-4">
           <div className="sm:col-span-2">
             <label className="mb-1.5 block text-[11px] text-mute" htmlFor="file">
               فایل اکسل گزارش
@@ -118,6 +134,27 @@ function ImportPage() {
               onChange={(e) => setStrategy(e.target.value)}
               className={fieldClass}
             />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-[11px] text-mute" htmlFor="offset">
+              اختلاف ساعت بروکر تا ایران
+            </label>
+            <select
+              id="offset"
+              value={offset}
+              onChange={(e) => changeOffset(Number(e.target.value))}
+              className={fieldClass}
+            >
+              <option value={330}>+۵:۳۰</option>
+              <option value={270}>+۴:۳۰</option>
+              <option value={210}>+۳:۳۰ (پیش‌فرض)</option>
+              <option value={150}>+۲:۳۰</option>
+              <option value={90}>+۱:۳۰</option>
+              <option value={30}>+۰:۳۰</option>
+              <option value={0}>بدون اختلاف</option>
+              <option value={-30}>−۰:۳۰</option>
+              <option value={-90}>−۱:۳۰</option>
+            </select>
           </div>
         </div>
 
@@ -168,7 +205,7 @@ function ImportPage() {
                 <tr className="border-b border-line text-[11px] text-mute">
                   <th className="px-5 py-3 text-right font-medium">✓</th>
                   <th className="px-3 py-3 text-right font-medium">تاریخ</th>
-                  <th className="px-3 py-3 text-right font-medium">ساعت</th>
+                  <th className="px-3 py-3 text-right font-medium">ساعت ایران</th>
                   <th className="px-3 py-3 text-right font-medium">جفت</th>
                   <th className="px-3 py-3 text-right font-medium">جهت</th>
                   <th className="px-3 py-3 text-right font-medium">لوت</th>
