@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useState } from "react";
 import { AppShell, StatCard } from "@/components/AppShell";
+import { useAllTrades } from "@/hooks/useAllTrades";
 import { useJournal } from "@/hooks/useJournal";
 import {
   buildInsights,
@@ -100,7 +102,11 @@ function BreakdownChart({ title, data }: { title: string; data: Bucket[] }) {
 }
 
 function InsightsPage() {
-  const { trades, capital } = useJournal();
+  const [mode, setMode] = useState<"account" | "all">("account");
+  const single = useJournal();
+  const all = useAllTrades();
+  const trades = mode === "all" ? all.trades : single.trades;
+  const capital = mode === "all" ? all.capital || 1 : single.capital;
   const stats = computeStats(trades, capital);
   const insights = buildInsights(trades, capital);
 
@@ -116,9 +122,63 @@ function InsightsPage() {
         </div>
         <h1 className="text-4xl font-extrabold leading-none tracking-tight">نقاط قوت و ضعف</h1>
         <p className="mt-2 text-sm text-mute">
-          بر پایه‌ی {stats.count} معامله‌ی ثبت‌شده در دفتر شما.
+          بر پایه‌ی {stats.count} معامله‌ی ثبت‌شده{" "}
+          {mode === "all" ? "در همه‌ی حساب‌ها" : "در حساب فعال"}.
         </p>
+        <div className="mt-4 inline-flex rounded-md bg-panel2 p-1 ring-1 ring-line">
+          <button
+            onClick={() => setMode("account")}
+            className={`rounded px-3 py-1.5 text-[12px] transition ${mode === "account" ? "bg-gold font-semibold text-background" : "text-mute"}`}
+          >
+            حساب فعال
+          </button>
+          <button
+            onClick={() => setMode("all")}
+            className={`rounded px-3 py-1.5 text-[12px] transition ${mode === "all" ? "bg-gold font-semibold text-background" : "text-mute"}`}
+          >
+            همه‌ی حساب‌ها
+          </button>
+        </div>
       </div>
+
+      {mode === "all" && all.accounts.length > 0 ? (
+        <div className="mb-6 overflow-hidden rounded-lg bg-panel ring-1 ring-line">
+          <div className="border-b border-line px-5 py-4 text-sm font-semibold">
+            مقایسه‌ی حساب‌ها
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-line text-[11px] text-mute">
+                  <th className="px-5 py-3 text-right font-medium">حساب</th>
+                  <th className="px-3 py-3 text-right font-medium">سرمایه</th>
+                  <th className="px-3 py-3 text-right font-medium">تعداد</th>
+                  <th className="px-3 py-3 text-right font-medium">نرخ برد</th>
+                  <th className="px-3 py-3 text-right font-medium">پایبندی</th>
+                  <th className="px-5 py-3 text-right font-medium">سود خالص</th>
+                </tr>
+              </thead>
+              <tbody className="tabular-nums">
+                {all.accounts.map((a) => {
+                  const st = computeStats(a.trades, a.capital || 1);
+                  return (
+                    <tr key={a.id} className="border-b border-line/60 last:border-0">
+                      <td className="px-5 py-2.5 font-medium">{a.name}</td>
+                      <td className="px-3 py-2.5 text-mute">{fmtUsd(a.capital)}</td>
+                      <td className="px-3 py-2.5 text-mute">{st.count}</td>
+                      <td className="px-3 py-2.5 text-mute">{fmtNum(st.winRate, 0)}٪</td>
+                      <td className="px-3 py-2.5 text-mute">{fmtNum(st.planAdherence, 0)}٪</td>
+                      <td className={`px-5 py-2.5 ${st.netPnl >= 0 ? "text-gain" : "text-loss"}`}>
+                        {fmtUsd(st.netPnl)}$
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
 
       {trades.length < 3 ? (
         <div className="rounded-lg bg-panel p-8 text-center ring-1 ring-line">
