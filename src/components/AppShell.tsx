@@ -64,6 +64,20 @@ export function AppShell({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {accounts.length > 0 ? (
+              <select
+                aria-label="انتخاب حساب"
+                value={selectedId ?? ""}
+                onChange={(e) => selectAccount(e.target.value)}
+                className="max-w-[10rem] rounded-md bg-panel2 px-2.5 py-1.5 text-[11px] text-foreground ring-1 ring-line outline-none transition focus:ring-gold"
+              >
+                {accounts.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            ) : null}
             <span className="hidden text-[11px] text-mute sm:block">
               {tradeCount} معامله ثبت‌شده
             </span>
