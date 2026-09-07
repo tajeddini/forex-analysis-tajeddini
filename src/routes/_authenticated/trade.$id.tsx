@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/trade/$id")({
 });
 
 function EditTrade() {
-  const { id } = useParams({ from: "/trade/$id" });
+  const { id } = useParams({ from: "/_authenticated/trade/$id" });
   const navigate = useNavigate();
   const { ready, trades, capital, updateTrade, removeTrade } = useJournal();
   const stats = computeStats(trades, capital);
