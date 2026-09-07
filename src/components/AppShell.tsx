@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { ReactNode } from "react";
 import { fmtUsd } from "@/lib/trades";
+import { useAccounts } from "@/hooks/useAccounts";
 
 const NAV = [
   { to: "/dashboard", label: "داشبورد", glyph: "▦" },
