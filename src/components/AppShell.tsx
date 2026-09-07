@@ -12,6 +12,7 @@ const NAV = [
   { to: "/trades", label: "لیست تریدها", glyph: "≡" },
   { to: "/insights", label: "تحلیل و بینش", glyph: "◍" },
   { to: "/strategies", label: "استراتژی‌ها", glyph: "✦" },
+  { to: "/accounts", label: "حساب‌ها", glyph: "◈" },
 ] as const;
 
 export function AppShell({
