@@ -240,6 +240,7 @@ function ImportPage() {
                       </td>
                       <td className="px-3 py-2.5 text-mute" dir="ltr">
                         {r.time}
+                        <span className="block text-[10px] opacity-60">{r.brokerTime}</span>
                       </td>
                       <td className="px-3 py-2.5 font-medium">{r.pair}</td>
                       <td className="px-3 py-2.5">
