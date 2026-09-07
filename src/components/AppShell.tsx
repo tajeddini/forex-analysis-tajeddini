@@ -29,6 +29,7 @@ export function AppShell({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
+  const { accounts, selectedId, selectAccount } = useAccounts();
 
   useEffect(() => {
     void supabase.auth.getUser().then(async ({ data }) => {
