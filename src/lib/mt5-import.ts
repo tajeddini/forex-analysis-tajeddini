@@ -4,6 +4,9 @@ import type { Session, Trade } from "@/lib/trades";
 export type ParsedRow = {
   externalId: string;
   date: string;
+  /** ساعت بروکر (همان چیزی که در فایل آمده) */
+  brokerTime: string;
+  /** ساعت به وقت ایران */
   time: string;
   pair: string;
   direction: "buy" | "sell";
@@ -37,10 +40,26 @@ function parseDateTime(v: unknown): { date: string; time: string } | null {
   return { date: `${m[1]}-${m[2]}-${m[3]}`, time: `${m[4]}:${m[5]}` };
 }
 
-export function sessionFromHour(hour: number): Session {
-  if (hour >= 8 && hour < 16) return "لندن";
-  if (hour >= 16 && hour < 22) return "نیویورک";
-  if (hour >= 0 && hour < 3) return "سیدنی";
+/** اختلاف پیش‌فرض ساعت بروکر تا ساعت ایران (دقیقه) — ۱۳:۰۰ بروکر = ۱۶:۳۰ ایران */
+export const DEFAULT_TEHRAN_OFFSET_MIN = 210;
+
+/** ساعت "HH:MM" بروکر را با اختلاف داده‌شده به ساعت ایران تبدیل می‌کند */
+export function shiftTime(time: string, offsetMinutes: number): string {
+  const [h = "0", m = "0"] = time.split(":");
+  let total = (Number(h) * 60 + Number(m) + offsetMinutes) % 1440;
+  if (total < 0) total += 1440;
+  const hh = String(Math.floor(total / 60)).padStart(2, "0");
+  const mm = String(total % 60).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+/** سشن بر اساس ساعت ایران */
+export function sessionFromTehranTime(time: string): Session {
+  const [h = "0", m = "0"] = time.split(":");
+  const t = Number(h) * 60 + Number(m);
+  if (t >= 11 * 60 + 30 && t < 19 * 60 + 30) return "لندن";
+  if (t >= 19 * 60 + 30 || t < 1 * 60 + 30) return "نیویورک";
+  if (t >= 1 * 60 + 30 && t < 6 * 60 + 30) return "سیدنی";
   return "توکیو";
 }
 
@@ -54,7 +73,10 @@ export function prettySymbol(raw: string): string {
 }
 
 /** Parse an MT5 "Trade History Report" xlsx: reads the Positions table. */
-export function parseMt5Workbook(buffer: ArrayBuffer): ParsedRow[] {
+export function parseMt5Workbook(
+  buffer: ArrayBuffer,
+  offsetMinutes: number = DEFAULT_TEHRAN_OFFSET_MIN,
+): ParsedRow[] {
   const wb = read(buffer, { type: "array" });
   const out: ParsedRow[] = [];
 
@@ -93,12 +115,13 @@ export function parseMt5Workbook(buffer: ArrayBuffer): ParsedRow[] {
       const commission = toNum(r[10]) ?? 0;
       const swap = toNum(r[11]) ?? 0;
       const closeAt = parseDateTime(r[8]);
-      const hour = Number((openAt.time.split(":")[0] ?? "0"));
+      const tehranTime = shiftTime(openAt.time, offsetMinutes);
 
       out.push({
         externalId: String(r[1] ?? `${openAt.date}-${symbol}-${i}`).trim(),
         date: closeAt?.date ?? openAt.date,
-        time: openAt.time,
+        brokerTime: openAt.time,
+        time: tehranTime,
         pair: prettySymbol(symbol),
         direction: type,
         lot,
@@ -106,7 +129,7 @@ export function parseMt5Workbook(buffer: ArrayBuffer): ParsedRow[] {
         exit,
         ...(stop && stop > 0 ? { stop } : {}),
         pnl: Number((profit + commission + swap).toFixed(2)),
-        session: sessionFromHour(hour),
+        session: sessionFromTehranTime(tehranTime),
       });
     }
   }
@@ -130,6 +153,6 @@ export function toTrade(row: ParsedRow, strategy: string): Trade {
     strategy,
     emotion: "آرام",
     followedPlan: true,
-    notes: `وارد شده از متاتریدر ۵ · ساعت ورود ${row.time}`,
+    notes: `وارد شده از متاتریدر ۵ · ساعت ورود ${row.time} به وقت ایران (${row.brokerTime} بروکر)`,
   };
 }
